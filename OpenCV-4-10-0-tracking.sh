@@ -1,12 +1,42 @@
 #!/bin/bash
 set -e
+
+# Parse command-line arguments
+for arg in "$@"
+do
+  case $arg in
+    --arch=*)
+      ARCH="${arg#*=}"
+      shift
+      ;;
+    --ptx=*)
+      PTX="${arg#*=}"
+      shift
+      ;;
+    *)
+      echo "Unknown option $arg"
+      exit 1
+      ;;
+  esac
+done
+
 install_opencv () {
-  echo "Installing OpenCV 4.10.0 with CUDA support on Ubuntu 22.04"
-  echo "This may take a while depending on system resources..."
 
   # Define CUDA architecture flags (adjust based on your GPU)
-  ARCH="8.6"
-  PTX="sm_86"
+  if [ -z "$ARCH" ]; then
+    echo "Error: --arch must be provided."
+    echo "Usage: ./OpenCV-4-10-0-tracking.sh --arch=6.1 [--ptx=6.1]"
+    exit 1
+  fi
+
+  if [ -z "$PTX" ]; then
+    PTX=$ARCH
+  fi
+
+  echo "Installing OpenCV 4.10.0 with CUDA support"
+  echo "This may take a while depending on system resources..."
+
+  PTX=""
 
   # Detect number of cores
   NO_JOB=$(nproc)
@@ -54,6 +84,7 @@ install_opencv () {
   sudo apt-get install -y liblapack-dev liblapacke-dev libeigen3-dev gfortran
   sudo apt-get install -y libhdf5-dev libprotobuf-dev protobuf-compiler
   sudo apt-get install -y libgoogle-glog-dev libgflags-dev
+  sudo apt-get install -y libtbb-dev # for installing on x86_64
  
   # remove old versions or previous builds
   cd ~ 
