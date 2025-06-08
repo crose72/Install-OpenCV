@@ -36,8 +36,6 @@ install_opencv () {
   echo "Installing OpenCV 4.10.0 with CUDA support"
   echo "This may take a while depending on system resources..."
 
-  PTX=""
-
   # Detect number of cores
   NO_JOB=$(nproc)
   
